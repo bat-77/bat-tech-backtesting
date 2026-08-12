@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAT-TECH QUANTITAVE — Backtest Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ LOADING SCREEN ============ -->
+<div id="loading-screen">
+  <div class="loading-logo">BAT-TECH <span class="quant">QUANTITAVE</span></div>
+  <div class="progress-track">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="loading-status" id="loading-status">Initializing Python engine...</div>
+</div>
+
+<!-- ============ TOP BAR ============ -->
+<header id="top-bar">
+  <div class="logo-small">BAT-TECH <span class="quant">QUANTITAVE</span></div>
+  <div class="top-bar-sub">Phase 1 &rarr; Phase 2 · Local Browser Backtest Engine</div>
+</header>
+
+<!-- ============ MAIN APP ============ -->
+<main id="app" class="hidden">
+
+  <section class="panel" id="panel-instrument">
+    <h2>1. Select Instrument</h2>
+    <div class="instrument-row">
+      <button class="instrument-btn" data-ticker="^IXIC" data-name="NDAQ">NDAQ</button>
+      <button class="instrument-btn" data-ticker="GC=F" data-name="XAU">XAU</button>
+      <button class="instrument-btn" data-ticker="BTC-USD" data-name="BTC">BTC</button>
+    </div>
+    <div class="data-controls">
+      <button id="load-data-btn" disabled>Load Data</button>
+      <button id="force-refresh-btn" disabled>Force Refresh (bypass cache)</button>
+      <button id="synthetic-data-btn" class="synthetic-btn" disabled>Generate Synthetic Data (offline)</button>
+      <span id="cache-status" class="status-text">No instrument selected.</span>
+    </div>
+    <div class="fallback-box">
+      <p><b>If live fetch fails:</b> click "Generate Synthetic Data" to test the engine immediately with no network needed (seeded random-walk data, clearly not real prices) — or upload a real OHLCV CSV below if you have one. Columns: <code>Date,Open,High,Low,Close,Volume</code></p>
+      <input type="file" id="csv-upload" accept=".csv">
+    </div>
+  </section>
+
+  <section class="panel" id="panel-expert">
+    <h2>2. Expert Strategy Code</h2>
+    <p class="hint">Paste your <code>Expert</code> class code below, or upload a .py file. Must define <code>init(self, data)</code> and <code>next(self, bar, position, equity)</code>.</p>
+    <div class="expert-controls">
+      <select id="preset-select">
+        <option value="">— Load a sample strategy —</option>
+        <option value="ndaqstrat1">ndaqstrat1.py (NDAQ Mean Reversion)</option>
+        <option value="xaustrat1">xaustrat1.py (XAU Volatility Breakout)</option>
+        <option value="btcstrat1">btcstrat1.py (BTC Trend Following)</option>
+      </select>
+      <input type="file" id="expert-upload" accept=".py">
+    </div>
+    <textarea id="expert-code" spellcheck="false" placeholder="class Expert:
+    def init(self, data):
+        ...
+    def next(self, bar, position, equity):
+        ..."></textarea>
+  </section>
+
+  <section class="panel" id="panel-run">
+    <h2>3. Run Backtest</h2>
+    <div class="fixed-params">
+      <span>Capital: <b>$100,000</b></span>
+      <span>Leverage: <b>100x</b></span>
+      <span>Commission: <b>0.10% / side</b></span>
+      <span>Delay: <b>0 bars</b></span>
+      <span>Data: <b>10y / 1mo</b></span>
+    </div>
+    <button id="run-btn" disabled>Run Backtest</button>
+    <span id="run-status" class="status-text"></span>
+  </section>
+
+  <section class="panel hidden" id="panel-results">
+    <h2>Results</h2>
+    <div id="metrics-table-wrap"></div>
+
+    <h3>Charts</h3>
+    <div class="chart-box"><canvas id="chart-price"></canvas></div>
+    <div class="chart-box"><canvas id="chart-equity"></canvas></div>
+    <div class="chart-box"><canvas id="chart-drawdown"></canvas></div>
+    <div class="chart-box"><canvas id="chart-monthly"></canvas></div>
+    <div class="chart-box"><canvas id="chart-tradepnl"></canvas></div>
+
+    <h3>Trade Log</h3>
+    <div id="trade-log-wrap"></div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="js/embedded_sources.js"></script>
+<script src="js/canvas_charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
